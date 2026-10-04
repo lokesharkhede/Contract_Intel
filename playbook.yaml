@@ -1,0 +1,90 @@
+# playbook.yaml
+# Simplified contract risk playbook — 10 common clauses.
+# Thresholds are illustrative defaults, meant to be edited per organization.
+
+clauses:
+
+  termination_notice:
+    label: "Termination Notice Period"
+    description: "Notice period (in days) required before either party may terminate without cause."
+    reference_text: "Either party may terminate this agreement for convenience by providing written notice."
+    value_type: "days"
+    acceptable_min_days: 30
+    acceptable_max_days: 90
+    risk_if_below_min: "high"
+    risk_if_above_max: "low"
+
+  liability_cap:
+    label: "Liability Cap"
+    description: "Maximum liability, expressed as a multiple of total fees paid under the agreement."
+    reference_text: "In no event shall either party's aggregate liability exceed the total fees paid."
+    value_type: "multiplier"
+    acceptable_min_multiplier: 1.0
+    risk_if_below_min: "high"
+    risk_if_missing: "high"
+
+  payment_terms:
+    label: "Payment Terms"
+    description: "Number of days allowed for payment after invoice date."
+    reference_text: "Payment is due within a specified number of days of the invoice date."
+    value_type: "days"
+    acceptable_max_days: 60
+    risk_if_above_max: "medium"
+
+  auto_renewal:
+    label: "Automatic Renewal"
+    description: "Whether the contract renews automatically without an affirmative re-negotiation step."
+    reference_text: "This agreement shall automatically renew for successive terms unless either party objects."
+    value_type: "boolean"
+    acceptable: false
+    risk_if_present: "medium"
+
+  indemnification:
+    label: "Indemnification"
+    description: "Whether indemnification obligations are mutual rather than one-sided."
+    reference_text: "Each party shall indemnify and hold harmless the other party from third-party claims."
+    value_type: "categorical"
+    acceptable_values: ["mutual"]
+    risk_if_one_sided: "high"
+
+  governing_law:
+    label: "Governing Law / Jurisdiction"
+    description: "Jurisdiction whose law governs the agreement, checked against an approved list."
+    reference_text: "This agreement shall be governed by the laws of a specified jurisdiction."
+    value_type: "jurisdiction"
+    acceptable_jurisdictions: ["Delaware", "New York", "England and Wales", "Ireland"]
+    risk_if_not_listed: "low"
+
+  confidentiality_duration:
+    label: "Confidentiality Survival Period"
+    description: "How many years confidentiality obligations survive after termination."
+    reference_text: "The confidentiality obligations herein shall survive termination for a period of years."
+    value_type: "years"
+    acceptable_min_years: 2
+    acceptable_max_years: 5
+    risk_if_below_min: "medium"
+    risk_if_above_max: "low"
+
+  limitation_of_liability_exclusions:
+    label: "Liability Cap Carve-outs"
+    description: "Whether standard carve-outs (confidentiality breach, gross negligence, IP infringement) are excluded from the liability cap."
+    reference_text: "The limitation of liability shall not apply to breaches of confidentiality, gross negligence, or infringement of intellectual property."
+    value_type: "boolean"
+    acceptable: true
+    risk_if_absent: "medium"
+
+  assignment_rights:
+    label: "Assignment Without Consent"
+    description: "Whether the agreement may be assigned to a third party without the other party's consent."
+    reference_text: "Neither party may assign this agreement without the prior written consent of the other party."
+    value_type: "boolean"
+    acceptable: false
+    risk_if_present: "medium"
+
+  dispute_resolution:
+    label: "Dispute Resolution Method"
+    description: "Method specified for resolving disputes — arbitration or litigation — versus left unspecified."
+    reference_text: "Any dispute arising under this agreement shall be resolved through arbitration or litigation."
+    value_type: "categorical"
+    acceptable_values: ["arbitration", "litigation"]
+    risk_if_unspecified: "low"

@@ -27,7 +27,6 @@ contract_intel/
 ├── DOCUMENTATION.md               # Full technical write-up + diagrams
 ├── playbook.yaml                  # The 10 clause rules (edit this to change risk logic)
 ├── requirements.txt
-├── generate_sample_contracts.py   # One-off script that made the 5 sample PDFs
 ├── app.py                         # Streamlit frontend — the only file you "run"
 │
 ├── data/
@@ -52,7 +51,6 @@ contract_intel/
 ```bash
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
-python generate_sample_contracts.py     # only needed once, PDFs already included
 export GEMINI_API_KEY="your-key-here"
 streamlit run app.py
 ```

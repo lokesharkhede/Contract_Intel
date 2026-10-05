@@ -1,13 +1,3 @@
-"""
-playbook_engine.py — deterministic rule evaluation.
-
-This is intentionally boring, plain Python: no LLM, no embeddings.
-Once nlp_utils.py has told us "this paragraph is the termination_notice
-clause" and pulled out "45 days" as the value, deciding whether 45 days
-breaches the playbook rule (min 30 / max 90) is arithmetic — arithmetic
-should not be delegated to a language model.
-"""
-
 import yaml
 from src import llm_gemini, nlp_utils
 from config import PLAYBOOK_PATH
@@ -20,10 +10,6 @@ def load_playbook() -> dict:
 
 def evaluate_clause(clause_type: str, rule: dict, matched_text: str | None,
                      structured_value=None) -> dict:
-    """
-    Evaluates a single matched (or missing) clause against its playbook rule.
-    Returns a flag dict if there's an issue, otherwise a clean-status dict.
-    """
     result = {
         "clause_type": clause_type,
         "label": rule.get("label", clause_type),
@@ -136,14 +122,6 @@ def evaluate_clause(clause_type: str, rule: dict, matched_text: str | None,
 
 
 def evaluate_contract(matches: list[dict], playbook: dict) -> list[dict]:
-    """Runs evaluate_clause() for every matched clause type.
-
-    This is the pure rule-based path, kept as-is. It's used two ways now:
-      1. Directly, if you want a fully deterministic run (see reconcile_contract's
-         `use_llm=False` option below).
-      2. As the guardrail fallback inside reconcile_contract() when the LLM's
-         cited evidence can't be verified.
-    """
     results = []
     for m in matches:
         rule = playbook["clauses"][m["clause_type"]]
@@ -152,21 +130,7 @@ def evaluate_contract(matches: list[dict], playbook: dict) -> list[dict]:
         ))
     return results
 
-
-# ---------------------------------------------------------------------------
-# Step 2 + Step 3 orchestration — evidence extraction, then LLM reconciliation,
-# then a deterministic guardrail that verifies the LLM's citation before
-# trusting its verdict.
-# ---------------------------------------------------------------------------
-
 def _citation_is_grounded(cited_value, evidence: dict) -> bool:
-    """
-    Checks that whatever the LLM says it relied on (cited_value) actually
-    appears somewhere in the Step 2 evidence dict, rather than being a
-    number or phrase the model generated on its own. This is the guardrail:
-    it doesn't judge whether the LLM's *reasoning* is correct, only whether
-    its claimed evidence is real.
-    """
     if cited_value in (None, "", "null"):
         return True  # a "not_found"/no-citation verdict has nothing to fabricate
     cited_str = str(cited_value).strip().lower()
@@ -185,25 +149,6 @@ def _citation_is_grounded(cited_value, evidence: dict) -> bool:
 
 
 def reconcile_contract(matches: list[dict], playbook: dict) -> list[dict]:
-    """
-    The full 3-step architecture:
-
-      Step 1 (already done upstream, in nlp_utils.match_clauses_to_paragraphs):
-              cosine similarity over embeddings picks the matched paragraph
-              for each clause type.
-      Step 2  nlp_utils.extract_evidence() pulls regex/NER/fuzzy-match signals
-              out of that paragraph -- no decisions made here.
-      Step 3  llm_client.reconcile_clause() reads the rule + evidence and
-              returns the actual risk verdict, citing which evidence it used.
-
-    Guardrail: after Step 3, _citation_is_grounded() checks the LLM's citation
-    against the Step 2 evidence. If it doesn't check out -- the LLM cited a
-    value that was never extracted -- its verdict is discarded and
-    evaluate_clause() (the deterministic path) is used for that clause
-    instead, with a note added explaining the fallback. This bounds how much
-    a single clause's outcome can be pure LLM invention, without giving up
-    the nuance an LLM adds over rigid threshold checks.
-    """
     results = []
     for m in matches:
         clause_type = m["clause_type"]

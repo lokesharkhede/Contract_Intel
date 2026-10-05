@@ -1,11 +1,3 @@
-"""
-config.py — central configuration.
-
-Keeping every tunable value in one place (model names, thresholds, paths)
-makes the rest of the codebase easy to read and easy to change without
-hunting through every file.
-"""
-
 import os
 from dotenv import load_dotenv
 
@@ -17,7 +9,7 @@ PLAYBOOK_PATH = os.path.join(BASE_DIR, "playbook.yaml")
 DB_PATH = os.path.join(BASE_DIR, "data", "contract_intel.db")
 CONTRACTS_DIR = os.path.join(BASE_DIR, "data", "contracts")
 
-# --- LLM (Gemini) ---
+# --- Gemini API ---
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
 

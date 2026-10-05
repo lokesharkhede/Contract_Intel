@@ -1,12 +1,3 @@
-"""
-app.py — Streamlit frontend for the Contract Intelligence & Redline Assistant.
-
-Two tabs:
-  1. Review a Contract   -> upload a PDF, run the LangGraph pipeline, see flags
-  2. Review History      -> browse previously reviewed contracts (from memory.py),
-                             and chat with any one of them
-"""
-
 import os
 import tempfile
 import streamlit as st
@@ -24,9 +15,6 @@ RISK_COLOR = {"high": "🔴", "medium": "🟠", "low": "🟡"}
 st.title("📄 Contract Intelligence & Redline Assistant")
 tab_review, tab_history = st.tabs(["Review a Contract", "Review History"])
 
-# ---------------------------------------------------------------------------
-# TAB 1 — Review a new contract
-# ---------------------------------------------------------------------------
 with tab_review:
     st.subheader("Upload a contract PDF")
     uploaded_file = st.file_uploader("Choose a PDF", type=["pdf"])
@@ -71,9 +59,6 @@ with tab_review:
                 if c.get("matched_text"):
                     st.caption(f"Matched contract text: \u201c{c['matched_text']}\u201d")
 
-# ---------------------------------------------------------------------------
-# TAB 2 — Review history + chat with a past contract
-# ---------------------------------------------------------------------------
 with tab_history:
     st.subheader("Previously Reviewed Contracts")
     contracts = memory.list_reviewed_contracts()

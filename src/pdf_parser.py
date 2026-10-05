@@ -1,22 +1,7 @@
-"""
-pdf_parser.py — turns a contract PDF into a list of clean text paragraphs.
-
-Unstructured.io's partition_pdf() breaks a PDF into typed elements
-(Title, NarrativeText, ListItem, Table, etc.) instead of one flat text blob.
-For contracts we mostly care about NarrativeText/Title elements — that's
-where clause language lives.
-"""
-
 from unstructured.partition.pdf import partition_pdf
 
-
 def parse_contract(pdf_path: str) -> list[str]:
-    """
-    Returns a list of paragraph-level text chunks from the PDF.
-    Each chunk is later checked against every clause type via semantic
-    similarity, so we keep chunks reasonably sized (roughly one section
-    or clause per chunk works best).
-    """
+
     elements = partition_pdf(filename=pdf_path, strategy="fast")
 
     paragraphs = []

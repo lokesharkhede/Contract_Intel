@@ -1,13 +1,3 @@
-"""
-memory.py — persistent storage for reviewed contracts.
-
-This is the "persistent memory" piece of the stack. It's deliberately simple:
-one SQLite database, two tables. It exists so that:
-  1. A reviewed contract's clause data survives after the Streamlit session ends.
-  2. You can chat with a past contract later without re-parsing the PDF.
-  3. You can build a "review history" view across every contract processed.
-"""
-
 import sqlite3
 import json
 from datetime import datetime, timezone

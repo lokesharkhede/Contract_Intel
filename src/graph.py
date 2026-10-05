@@ -1,30 +1,3 @@
-"""
-graph.py — LangGraph orchestration.
-
-Pipeline:
-
-  partition_pdf_node
-        |
-        v
-  semantic_clause_matching_node   (Step 1 — cosine similarity picks the clause paragraph)
-        |
-        v
-  evaluate_against_playbook_node  (Step 2 + 3, inside playbook_engine.reconcile_contract:
-        |                          regex/NER/fuzzy evidence extraction, then LLM
-        |                          reconciliation with a grounding guardrail)
-        v
-  route_on_flags  (conditional edge)
-      |                     |
-      v                     v
-  clean_summary_node   risk_report_node   (LLM writes a plain-English narrative)
-      |                     |
-      +----------+----------+
-                 v
-          persist_node  (sqlite — memory)
-                 v
-                END
-"""
-
 from typing import TypedDict, Optional
 from langgraph.graph import StateGraph, END
 
@@ -42,10 +15,6 @@ class ContractState(TypedDict, total=False):
     contract_id: int
     route: str
 
-
-# ---------------------------------------------------------------------------
-# Nodes
-# ---------------------------------------------------------------------------
 
 def partition_pdf_node(state: ContractState) -> dict:
     paragraphs = pdf_parser.parse_contract(state["pdf_path"])
@@ -80,11 +49,6 @@ def risk_report_node(state: ContractState) -> dict:
 def persist_node(state: ContractState) -> dict:
     contract_id = memory.save_review(state["contract_name"], state["clause_results"], state["summary"])
     return {"contract_id": contract_id}
-
-
-# ---------------------------------------------------------------------------
-# Graph assembly
-# ---------------------------------------------------------------------------
 
 def build_graph():
     graph = StateGraph(ContractState)
